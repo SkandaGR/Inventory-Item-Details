@@ -1,0 +1,4 @@
+1.Using Local PgAdmin I have Created the DB which conatains Store Procedures and Tables(Scripts i have attached in Folder : DataBase Scripts).
+2.Please find the Screenshot in the folder for Application Front End.
+3.Using ADO.NET i have Connected to DB.
+4.Please find InventoryDetails.cs class for Code which contains for adding Items for Inventory.
