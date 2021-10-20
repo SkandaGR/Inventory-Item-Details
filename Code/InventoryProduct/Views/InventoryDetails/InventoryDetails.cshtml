@@ -1,0 +1,255 @@
+﻿@model InventoryProduct.Models.InventoryDetails
+@{
+    ViewBag.Title = "InventoryDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+@if (Model.Message != null && Model.Message != "")
+{
+    <script type="text/javascript">
+        alert('@Model.Message');
+        window.location.href = "../InventoryDetails/InventoryDetails";
+    </script>
+}
+
+@using (Html.BeginForm())
+{
+    <div class="main-content">
+        <div class="main-content-inner">
+            <div class="breadcrumbs ace-save-state" id="breadcrumbs">
+            </div>
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="breadcromb-area">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="seipkon-breadcromb-left">
+                                        <h3>Inventory Item Details</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>Inventory Details</label>
+                        @Html.TextAreaFor(m => m.InventoryName, new { @class = "form-control", autocomplete = "off", id = "txtInventoryName", @style = "resize:none", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="row">
+                    @Html.HiddenFor(m => m.InventoryId, new { @class = "form-control", id = "hdnInventoryId" })
+                    @Html.HiddenFor(m => m.PkId, new { @class = "form-control", id = "hdnPkId" })
+
+                    <div class="col-md-3">
+                        <label>Item Code<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(m => m.ItemCode, new { @class = "form-control", id = "txtItemCode", @maxLength = "40", @oncopy = "return false", @onpaste = "return false" , @autocomplete = "off" })
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3">
+                        <label>Item Name<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(m => m.ItemName, new { @class = "form-control", autocomplete = "off", id = "txtItemName", @maxLength = "40", @oncopy = "return false", @onpaste = "return false"  })
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3">
+                        <label>Item Description</label>
+                        @Html.TextAreaFor(m => m.ItemDesc, new { @class = "form-control", autocomplete = "off", id = "txtItemDesc", @style = "resize:none", @maxLength = "200" })
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Item Price<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(m => m.ItemPrice, new { @class = "form-control numberonly", autocomplete = "off", id = "txtItemPrice", @maxLength = "5", @oncopy = "return false", @onpaste = "return false" })
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3">
+                        <label>Unit of Measure<span class="mandatory">*</span></label>
+                        @Html.DropDownListFor(m => m.UnitMeasureId, Model.ListUnitMeasure, new { @class = "form-control", id = "ddlUnitMeasureId" })
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-3">
+                        <label>No of Units<span class="mandatory">*</span></label>
+                        @Html.TextBoxFor(m => m.NumUnits, new { @class = "form-control numberonly", autocomplete = "off", id = "txtNumUnits", @maxLength = "5", @oncopy = "return false", @onpaste = "return false" })
+                    </div>
+                </div>
+                <br />
+                <div class="text-center">
+                    <input id="btnSave" type="submit" class="btn btn-success" value="Save" />
+                    <input id="btnReset" type="button" class="btn btn-danger" value="Reset" />
+                </div>
+                <br /><br />
+
+                <table id="grdInventoryDetails" class="table display table-bordered">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th style="text-align: center">Item Code</th>
+                            <th style="text-align: center">Item Name</th>
+                            <th style="text-align: center">Item Description</th>
+                            <th style="text-align: center">Item Price</th>
+                            <th style="text-align: center">Unit of Measure</th>
+                            <th style="text-align: center">No of Units</th>
+                            <th style="text-align: center">Update</th>
+                            <th style="text-align: center">Delete</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.numberonly').keypress(function (e) {
+            var charCode = (e.which) ? e.which : event.keyCode
+            if (String.fromCharCode(charCode).match(/[^0-9]/g))
+                return false;
+        });
+
+        $('#grdInventoryDetails').DataTable({
+            "ajax": {
+                "url": "../InventoryDetails/FetchInventoryItemDetails",
+                "contentType": "application/json; charset=utf-8",
+                "type": "GET",
+                "datatype": "json",
+            },
+            "columns": [
+            { "data": "ItemCode", "autoWidth": true, "sortable": true },
+            { "data": "ItemName", "autoWidth": true, "sortable": true },
+            { "data": "ItemDesc", "autoWidth": true, "sortable": true },
+            { "data": "ItemPrice", "autoWidth": true, "sortable": true },
+            { "data": "UnitMeasureVal", "autoWidth": true, "sortable": true },
+            { "data": "NumUnits", "autoWidth": true, "sortable": true },
+            {
+                "data": "PkId", "autoWidth": true, "sortable": true, "render": function (data, type, row) {
+                    return '<a style="color:Blue;" href="javascript:UpdateVal(\'' + row.PkId + '\')"  class="far fa-edit" title="Update"></a>';
+                }
+            },
+            {
+                "data": "PkId", "autoWidth": true, "sortable": true, "render": function (data, type, row) {
+                    return '<a style="color:red;" href="javascript:DeleteVal(\'' + row.PkId + '\')"  class="fa fa-trash" title="Delete"></a>';
+                }
+            },
+            ],
+            responsive: true
+        });
+
+        $("#btnSave").click(function (e) {
+
+            var ItemCode = $('#txtItemCode').val();
+            var ItemName = $('#txtItemName').val();
+            var ItemPrice = $('#txtItemPrice').val();
+            var NumUnits = $('#txtNumUnits').val();
+
+            if (ItemCode.trim() == "") {
+                alert("Please enter Item Code");
+                $("#txtItemCode").focus();
+                $("#txtItemCode").val('');
+                event.preventDefault();
+                return false;
+            }
+            else if (ItemName.trim() == "") {
+                alert("Please enter Item Name");
+                $("#txtItemName").focus();
+                $("#txtItemName").val('');
+                event.preventDefault();
+                return false;
+            }
+            else if (ItemPrice.trim() == "") {
+                alert("Please enter Item Price");
+                $("#txtItemPrice").focus();
+                $("#txtItemPrice").val('');
+                event.preventDefault();
+                return false;
+            }
+            else if (parseInt(ItemPrice) <= 0) {
+                alert("Please enter Item Price");
+                $("#txtItemPrice").focus();
+                $("#txtItemPrice").val('');
+                event.preventDefault();
+                return false;
+            }
+            else if (NumUnits.trim() == "") {
+                alert("Please enter No of Units");
+                $("#txtNumUnits").focus();
+                $("#txtNumUnits").val('');
+                event.preventDefault();
+                return false;
+            }
+            else if (parseInt(NumUnits) <= 0) {
+                alert("Please enter No of Units");
+                $("#txtNumUnits").focus();
+                $("#txtNumUnits").val('');
+                event.preventDefault();
+                return false;
+            }
+
+            if (confirm("Are you sure want to Proceed?")) {
+                return true;
+            }
+            else {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        $("#btnReset").click(function (e) {
+            window.location.href = "../InventoryDetails/InventoryDetails";
+        });
+
+
+    });
+
+    function UpdateVal(PkId)
+    {
+        var url = '@Url.Action("UpdateVal", "InventoryDetails")';
+        $.post(url, {
+            PkId: PkId,
+        },
+        function (data) {
+            $('#hdnInventoryId').val(data.InventoryId);
+            $('#hdnPkId').val(data.PkId);
+            $('#txtInventoryName').val(data.InventoryName);
+            $('#txtItemCode').val(data.ItemCode);
+            $('#txtItemName').val(data.ItemName);
+            $('#txtItemDesc').val(data.ItemDesc);
+            $('#txtItemPrice').val(data.ItemPrice);
+            $('#ddlUnitMeasureId').val(data.UnitMeasureId);
+            $('#txtNumUnits').val(data.NumUnits);
+            $('#btnSave').val("Update");
+        });
+    }
+
+    function DeleteVal(PkId) {
+
+        if (confirm("Are you sure want to Delete?")) {
+            var url = '@Url.Action("DeleteVal", "InventoryDetails")';
+            $.post(url, {
+                PkId: PkId,
+            },
+            function (data) {
+                if (data == "0")
+                {
+                    alert('Deleted Successfully');
+                }
+                else
+                {
+                    alert('Something Went Wrong!');
+                }
+                window.location.href = "../InventoryDetails/InventoryDetails";
+            });
+        }
+        else {
+            return false;
+        }
+
+
+    }
+
+</script>
